@@ -49,12 +49,12 @@ port a 0
 /* Les inclusions de fichiers standards ( entrees/sorties et sockets ) sont 
 	effectuees dans le fichier de prototypage FON.H 			*/
 
-#include<stdio.h>
-#include<unistd.h>
+#include <stdio.h>
+#include <unistd.h>
 #include <stdarg.h>
 #include <string.h>
-#include<stdlib.h>
-#include<sys/socket.h>
+#include <stdlib.h>
+#include <sys/socket.h>
 #include <arpa/inet.h>
 
 #include "fon.h"

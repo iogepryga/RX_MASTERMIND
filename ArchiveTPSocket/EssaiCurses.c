@@ -4,8 +4,9 @@
 
 #include <curses.h>
 #include <unistd.h>
+#include <stdlib.h>
 
-main()
+int main()
 {
 	WINDOW *W1, *L1, *W2, *L2, *C;
   	pid_t PID;

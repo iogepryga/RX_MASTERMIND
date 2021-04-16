@@ -62,9 +62,23 @@ void serveur_appli(char *service)
 /* Procedure correspondant au traitemnt du serveur de votre application */
 
 {
+	struct sockaddr_in *a; // local
+	struct sockaddr_in *info_client; //distant
+		
+	int id_socket_listen = h_socket(AF_INET, SOCK_STREAM);
+	adr_socket(service,"*",SOCK_STREAM,&a);
+	h_bind(id_socket_listen,a);
+	h_listen(id_socket_listen, 5);
+	int id_socket_client = h_accept(id_socket_listen,info_client);
 
-/* A completer ... */
 
+	char buffer[100];
+	h_reads(id_socket_client,buffer,100);
+
+	printf("%s",buffer);
+
+	h_close(id_socket_client);
+	h_close(id_socket_listen);
 }
 
 /******************************************************************************/	

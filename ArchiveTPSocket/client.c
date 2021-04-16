@@ -15,7 +15,7 @@
 #include <curses.h> 		/* Primitives de gestion d'ecran */
 #include <sys/signal.h>
 #include <sys/wait.h>
-#include<stdlib.h>
+#include <stdlib.h>
 
 #include "fon.h"   		/* primitives de la boite a outils */
 
@@ -23,6 +23,13 @@
 #define SERVEUR_DEFAUT "127.0.0.1"
 
 void client_appli (char *serveur, char *service);
+
+int string_length(char *s) {
+  int result = 0;
+  for(int i = 0; *(s+i) != 0 ; i++)
+    result++;
+  return result;
+}
 
 
 /*****************************************************************************/
@@ -68,11 +75,23 @@ void client_appli (char *serveur,char *service)
 /* procedure correspondant au traitement du client de votre application */
 
 {
-  
+	struct sockaddr_in *a,*b;
+		
+	int id_socket = h_socket(AF_INET, SOCK_STREAM);
 
-/* a completer .....  */
+	adr_socket(service,serveur,SOCK_STREAM,&a); // distant
 
- }
+	adr_socket(service,"*",SOCK_STREAM,&b); // local
+	b->sin_port=0;
+
+	h_bind(id_socket,b);
+	h_connect(id_socket,a);
+
+	char *s = "test client";
+	h_writes(id_socket,s,string_length(s)+1);
+
+	h_close(id_socket);
+}
 
 /*****************************************************************************/
 
