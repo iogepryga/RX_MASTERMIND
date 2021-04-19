@@ -23,8 +23,7 @@
 
 #define SERVICE_DEFAUT "1111"
 
-#define send_error() buffer[0]=8;h_writes(id_socket_client,buffer,1)
-#define NB_TRY_MAX 10
+#define send_error() buffer[0]=8;h_writes(id_socket_client,buffer,1);
 
 void serveur_appli (char *service);   /* programme serveur */
 
@@ -82,9 +81,10 @@ void serveur_appli(char *service)
 	while(1) {
 
 		int id_socket_client = h_accept(id_socket_listen,info_client);
+		//srand(info_client->sin_port);
 		srand(time(NULL));
 		char* combinaison;
-		int n = -1, nb_try = 0;
+		int n = -1;
 
 		while(1) {
 			h_reads(id_socket_client,buffer,1);
@@ -94,21 +94,13 @@ void serveur_appli(char *service)
 				n = buffer[0];
 				combinaison = (char*)malloc(n*sizeof(char));
 				for(int i = 0; i < n ; i++) {
-					combinaison[i] = rand() % 8;
+					*combinaison = rand() % 8;
 				}
-
-				for(int i = 0; i < n ; i++) {
-					printf("%d ",combinaison[i]);
-				}
-				printf("\n");
+				// buffer[0] = 9;
+				// h_writes(id_socket_client,buffer,1); // ack
 				break;
 			case 2: // ask
-				if(n==-1) {
-					send_error();
-				} else if (nb_try >= NB_TRY_MAX){
-					buffer[0] = 6;
-					h_writes(id_socket_client,buffer,1); // fail
-				} else {
+				if(n!=-1) {
 					h_reads(id_socket_client,buffer,n);
 					int blanc = 0,rouge = 0;
 					for(int i = 0; i < n; i++) { // première passe (rouge)
@@ -118,33 +110,34 @@ void serveur_appli(char *service)
 						}
 					}
 					for(int i = 0; i < n; i++) { // deuxième passe (blanc)
-						if(buffer[i] != -2) {
-							for(int j = 0; j < n; j++) {
-								if(combinaison[i] == buffer[j]) {
-									buffer[j]= -1;
-									blanc++;
-									break;
-								}
+						if(buffer[i] == -2)
+							break;
+						for(int j = 0; j < n; j++) {
+							if(combinaison[i] == buffer[j]) {
+								buffer[j]= -1;
+								blanc++;
+								break;
 							}
 						}
 					}
 					if(rouge == n) {
 						buffer[0] = 4;
-						h_writes(id_socket_client,buffer,1); // win
+							h_writes(id_socket_client,buffer,1); // win
 					} else {
 						buffer[0] = 4;
 						buffer[1] = rouge;
 						buffer[2] =	blanc;
 						h_writes(id_socket_client,buffer,3); // reply
 					}
-					nb_try++;
+				} else {
+					send_error()
 				}
 				break;
 			case 3: // stop
 				// ????????????????????????????????????????????
 				break;
 			default:
-				send_error();
+				send_error()
 				break;
 			}
 		
@@ -153,12 +146,18 @@ void serveur_appli(char *service)
 		}
 
 		h_close(id_socket_client);
-		free(combinaison);
-		
+		h_close(id_socket_listen);
 
 	}
 
-	h_close(id_socket_listen);
+
+
+
+
+
+
+
+
 }
 
 /******************************************************************************/	

@@ -16,6 +16,7 @@
 #include <sys/signal.h>
 #include <sys/wait.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include "fon.h"   		/* primitives de la boite a outils */
 
@@ -87,8 +88,29 @@ void client_appli (char *serveur,char *service)
 	h_bind(id_socket,b);
 	h_connect(id_socket,a);
 
-	char *s = "test client";
-	h_writes(id_socket,s,string_length(s)+1);
+	char buffer[100];
+
+	int n = 10;
+
+	buffer[0] = 1; buffer[1] = n;
+	h_writes(id_socket,buffer,2);
+
+
+	sleep(4);
+	buffer[0] = 2;
+	srand(time(NULL));
+	for(int i = 1 ; i <= n ; i++) {
+		buffer[i] = rand() % 8;
+		printf("%d ",buffer[i]);
+	}
+	h_writes(id_socket,buffer,n+1);
+	printf("\n");
+
+	h_reads(id_socket,buffer,1);
+	if(buffer[0] == 4) {
+		h_reads(id_socket,buffer,2);
+		printf("%d %d\n",buffer[0],buffer[1]);
+	}
 
 	h_close(id_socket);
 }
