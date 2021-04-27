@@ -69,6 +69,7 @@ void serveur_appli(char *service)
 	struct sockaddr_in *a; // local
 	struct sockaddr_in *info_client; //distant
 	char buffer[100];
+	char stop = 0;
 		
 	int id_socket_listen = h_socket(AF_INET, SOCK_STREAM);
 	adr_socket(service,"*",SOCK_STREAM,&a);
@@ -79,11 +80,11 @@ void serveur_appli(char *service)
 
 
 
-	while(1) {
+	while(!stop) {
 
 		int id_socket_client = h_accept(id_socket_listen,info_client);
 		srand(time(NULL));
-		char* combinaison;
+		char* combinaison = NULL;
 		int n = -1, nb_try = 0;
 
 		while(1) {
